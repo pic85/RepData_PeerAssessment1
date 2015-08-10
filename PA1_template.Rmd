@@ -62,7 +62,7 @@ The mean of steps taken per day is `r media` and the median is `r mediana`.
 
 ## What is the average daily activity pattern?
 
-I Plot the  5-minute interval time series of the average number of steps taken
+I plot the  5-minute interval time series of the average number of steps taken
 
 ```{r, warning=FALSE}
 # summarise data per interval into a new dataframe

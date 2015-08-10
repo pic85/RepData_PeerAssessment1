@@ -121,7 +121,7 @@ mediana &lt;- median(days$tot_steps, na.rm = T)</code></pre>
 </div>
 <div id="what-is-the-average-daily-activity-pattern" class="section level2">
 <h2>What is the average daily activity pattern?</h2>
-<p>I Plot the 5-minute interval time series of the average number of steps taken</p>
+<p>I plot the 5-minute interval time series of the average number of steps taken</p>
 <pre class="r"><code># summarise data per interval into a new dataframe
 intervals &lt;-  summarise(group_by(data, interval),
                         mean_steps = mean(steps,na.rm = T))

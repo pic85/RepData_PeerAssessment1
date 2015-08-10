@@ -83,7 +83,7 @@ The mean of steps taken per day is 9354 and the median is 10395.
 
 ## What is the average daily activity pattern?
 
-I Plot the  5-minute interval time series of the average number of steps taken
+I plot the  5-minute interval time series of the average number of steps taken
 
 
 ```r
