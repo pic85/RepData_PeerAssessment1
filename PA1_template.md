@@ -18,21 +18,18 @@ library(RCurl)
 # get url
 URL <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 
+# getting work directory
+directory <- getwd()
+
 # downloading zip file
-download.file(URL,destfile="activity.zip",method="libcurl")
+download.file(URL, 
+              destfile= paste(directory,"/activity.zip", sep=""),
+              method="libcurl")
 
 # extracting zip file
 unzip("activity.zip")
-```
 
-```
-## Warning in unzip("activity.zip"): errore 1 durante l'estrazione
-## dall'archivio zip
-```
-
-```r
 # getting file directory
-directory <- getwd()
 file <- paste(directory, "/activity.csv", sep="")
 
 # loading data into R
@@ -75,25 +72,14 @@ plot(y=days$tot_steps, x=days$date, type = "h", xlab="Day", ylab="N of steps")
 
 ![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
 
-I calculate the mean and the median of steps taken per day.
-
 
 ```r
 # calculating mean and median of steps per day
-mean(days$tot_steps, na.rm = T)
+media <- round(mean(days$tot_steps, na.rm = T),0)
+mediana <- median(days$tot_steps, na.rm = T)
 ```
 
-```
-## [1] 9354.23
-```
-
-```r
-median(days$tot_steps, na.rm = T)
-```
-
-```
-## [1] 10395
-```
+The mean of steps taken per day is 9354 and the median is 10395.
 
 ## What is the average daily activity pattern?
 
@@ -114,27 +100,20 @@ plot(intervals$mean_steps~intervals$interval, na.rm = T,
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
-The 5-minute interval which contains on average the maximum number of steps is:
 
 
 ```r
-intervals$interval[intervals$mean_steps==max(intervals$mean_steps)]
+max_interval <- intervals$interval[intervals$mean_steps==max(intervals$mean_steps)]
 ```
 
-```
-## [1] 835
-```
-
-The average number of steps for this 5-minute interval is:
+The 5-minute interval number 835 contains on average the maximum number of steps.
 
 
 ```r
-max(intervals$mean_steps)
+max_steps <- round(max(intervals$mean_steps),0)
 ```
 
-```
-## [1] 206.1698
-```
+The average number of steps for this 5-minute interval is 206.
 
 ## Imputing missing values
 
@@ -170,10 +149,13 @@ I make two histograms of the total number of steps taken per day one for each da
 # summarise data per day into a new dataframe
 imp_days <- summarise(group_by(imp_data, date),
                       tot_steps = sum(steps,na.rm = T))
+
 # transforming string to date
 imp_days$date <- strptime(imp_days$date, format = "%Y-%m-%d")
+
 # using two colomns for the plot
 par(mfcol=c(1,2))
+
 # plotting original data 
 plot(y=days$tot_steps, x=days$date, 
      type = "h", 
@@ -192,37 +174,26 @@ plot(y=imp_days$tot_steps, x=imp_days$date,
 
 ![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
-I Calculate the mean and median steps per day with the imputed data.
-
 
 ```r
-mean(imp_days$tot_steps, na.rm = T)
+media_imp <- round(mean(imp_days$tot_steps, na.rm = T),0)
+mediana_imp <- median(imp_days$tot_steps, na.rm = T)
 ```
 
-```
-## [1] 9503.869
-```
-
-```r
-median(imp_days$tot_steps, na.rm = T)
-```
-
-```
-## [1] 10395
-```
+The mean steps per day with the imputed data is 9504 and median is 10395.
 
 The mean of total steps per day is slightly different between the two dataset, the median is the same.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-I Create a new variable called "weekday".
+I create a new variable called "weekday".
 
 
 ```r
 # creating a variable with the name of the day
 imp_data <- mutate(imp_data, weekday = weekdays(strptime(imp_data$date, format = "%Y-%m-%d")))
 
-# replacing the name of the day with "weekday" of "weekend"
+# replacing the name of the day with "weekday" or "weekend"
 imp_data$weekday[imp_data$weekday=="lunedì"|
                      imp_data$weekday=="martedì"|
                      imp_data$weekday=="mercoledì"|
@@ -233,7 +204,7 @@ imp_data$weekday[imp_data$weekday=="sabato"|
                      imp_data$weekday=="domenica"] <- "weekend"
 ```
 
-I Plot the time series for week days and week ends.
+I plot the time series for week days and week ends.
 
 
 ```r
@@ -242,7 +213,8 @@ weekday_data <- filter(imp_data, weekday == "weekday")
 weekend_data <- filter(imp_data, weekday == "weekend")
 
 # summarise by interval 
-intervals_weekday <- summarise(group_by(weekday_data, interval),                                 mean_steps = mean(steps,na.rm = T))
+intervals_weekday <- summarise(group_by(weekday_data, interval),
+                               mean_steps = mean(steps,na.rm = T))
 
 # summarise by interval
 intervals_weekend <-   summarise(group_by(weekend_data, interval),
@@ -257,7 +229,8 @@ plot(intervals_weekday$mean_steps~intervals_weekday$interval,
      xlab="5-minute interval",
      ylab="N of steps",
      col="blue",
-     main="Week day")
+     main="Week day",
+     ylim=c(0,200))
 
 # plotting weekend
 plot(intervals_weekend$mean_steps~intervals_weekend$interval,
@@ -265,7 +238,8 @@ plot(intervals_weekend$mean_steps~intervals_weekend$interval,
      xlab="5-minute interval",
      ylab="N of steps",
      col="red",
-     main="Week end")
+     main="Week end",
+     ylim=c(0,200))
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
