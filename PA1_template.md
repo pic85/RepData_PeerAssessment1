@@ -1,18 +1,20 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ## Loading and preprocessing the data
 
 I load the data from the github repository
 
-```{r}
+
+```r
 # loading packages
 library(RCurl)
+```
 
+```
+## Loading required package: bitops
+```
+
+```r
 # get url
 URL <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 
@@ -21,7 +23,14 @@ download.file(URL,destfile="activity.zip",method="libcurl")
 
 # extracting zip file
 unzip("activity.zip")
+```
 
+```
+## Warning in unzip("activity.zip"): errore 1 durante l'estrazione
+## dall'archivio zip
+```
+
+```r
 # getting file directory
 directory <- getwd()
 file <- paste(directory, "/activity.csv", sep="")
@@ -34,10 +43,26 @@ data <- read.csv("activity.csv")
 
 I calculate the total number of steps taken per day and I show the histogram.
 
-```{r}
+
+```r
 # loading package
 library(dplyr)
+```
 
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 # summarise data per day into a new dataframe
 days <- summarise(group_by(data, date), tot_steps =sum(steps,na.rm = T))
 
@@ -48,19 +73,34 @@ days$date <- strptime(days$date, format = "%Y-%m-%d")
 plot(y=days$tot_steps, x=days$date, type = "h", xlab="Day", ylab="N of steps")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
 I calculate the mean and the median of steps taken per day.
 
-```{r}
+
+```r
 # calculating mean and median of steps per day
 mean(days$tot_steps, na.rm = T)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(days$tot_steps, na.rm = T)
+```
+
+```
+## [1] 10395
 ```
 
 ## What is the average daily activity pattern?
 
 I Plot the  5-minute interval time series of the average number of steps taken
 
-```{r, warning=FALSE}
+
+```r
 # summarise data per interval into a new dataframe
 intervals <-  summarise(group_by(data, interval),
                         mean_steps = mean(steps,na.rm = T))
@@ -72,29 +112,47 @@ plot(intervals$mean_steps~intervals$interval, na.rm = T,
      ylab="N of steps")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 The 5-minute interval which contains on average the maximum number of steps is:
 
-```{r}
+
+```r
 intervals$interval[intervals$mean_steps==max(intervals$mean_steps)]
+```
+
+```
+## [1] 835
 ```
 
 The average number of steps for this 5-minute interval is:
 
-```{r}
+
+```r
 max(intervals$mean_steps)
+```
+
+```
+## [1] 206.1698
 ```
 
 ## Imputing missing values
 
 The total number of missing values in the dataset is:
 
-```{r}
+
+```r
 sum(is.na(data))
+```
+
+```
+## [1] 2304
 ```
 
 Each missing value is replaced with the median value of the related interval. Mean was not used beause it greatly overestimates the numeber of steps.
 
-```{r}
+
+```r
 # creating a copy of the data frame
 imp_data <- data
 
@@ -107,7 +165,8 @@ imp_data$steps[is.na(imp_data$steps)] <- imp_data$med_steps[is.na(imp_data$steps
 
 I make two histograms of the total number of steps taken per day one for each dataset.
 
-```{r}
+
+```r
 # summarise data per day into a new dataframe
 imp_days <- summarise(group_by(imp_data, date),
                       tot_steps = sum(steps,na.rm = T))
@@ -131,11 +190,25 @@ plot(y=imp_days$tot_steps, x=imp_days$date,
      col="red")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+
 I Calculate the mean and median steps per day with the imputed data.
 
-```{r}
+
+```r
 mean(imp_days$tot_steps, na.rm = T)
+```
+
+```
+## [1] 9503.869
+```
+
+```r
 median(imp_days$tot_steps, na.rm = T)
+```
+
+```
+## [1] 10395
 ```
 
 The mean of total steps per day is slightly different between the two dataset, the median is the same.
@@ -144,7 +217,8 @@ The mean of total steps per day is slightly different between the two dataset, t
 
 I Create a new variable called "weekday".
 
-```{r}
+
+```r
 # creating a variable with the name of the day
 imp_data <- mutate(imp_data, weekday = weekdays(strptime(imp_data$date, format = "%Y-%m-%d")))
 
@@ -161,7 +235,8 @@ imp_data$weekday[imp_data$weekday=="sabato"|
 
 I Plot the time series for week days and week ends.
 
-```{r, warning=FALSE}
+
+```r
 # separating week days from week ends
 weekday_data <- filter(imp_data, weekday == "weekday")
 weekend_data <- filter(imp_data, weekday == "weekend")
@@ -192,5 +267,7 @@ plot(intervals_weekend$mean_steps~intervals_weekend$interval,
      col="red",
      main="Week end")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
 
 According to the graph, the activity seems to be more distributed in the whole day during week ends; in particular in week ends the average number of steps taken in the afternoon is higher, while in the morning is slightly lower.
